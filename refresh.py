@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 from pathlib import Path
 import pandas as pd
+import subprocess
 
 from Scraping import get_attendance_data
 
@@ -20,6 +21,52 @@ DATA_FOLDER.mkdir(exist_ok=True)
 
 DATA_FILE = DATA_FOLDER / "AMS_Attendance_Data.xlsx"
 TEMP_FILE = DATA_FOLDER / "AMS_Attendance_Data_temp.xlsx"
+
+def push_to_github():
+
+    print("\nPushing refreshed data to GitHub...")
+
+    try:
+        # Stage refreshed Excel
+        subprocess.run(
+            ["git", "add", "data/AMS_Attendance_Data.xlsx"],
+            cwd=BASE_DIR,
+            check=True
+        )
+
+        # Check whether the Excel actually changed
+        result = subprocess.run(
+            ["git", "diff", "--cached", "--quiet"],
+            cwd=BASE_DIR
+        )
+
+        if result.returncode == 0:
+            print("No data changes. Nothing to push.")
+            return
+
+        # Commit
+        commit_message = (
+            f"Auto attendance refresh "
+            f"{datetime.now():%Y-%m-%d %H:%M}"
+        )
+
+        subprocess.run(
+            ["git", "commit", "-m", commit_message],
+            cwd=BASE_DIR,
+            check=True
+        )
+
+        # Push
+        subprocess.run(
+            ["git", "push"],
+            cwd=BASE_DIR,
+            check=True
+        )
+
+        print("GitHub push successful.")
+
+    except subprocess.CalledProcessError as e:
+        print(f"GitHub push failed: {e}")
 
 
 # =========================================================
@@ -194,3 +241,6 @@ print("Refreshed:", start_date, "→", end_date)
 print("Fresh rows:", len(new_df))
 print("Total rows:", len(final_df))
 print("Saved to:", DATA_FILE)
+
+# Upload refreshed Excel to GitHub
+push_to_github()
