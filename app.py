@@ -11,7 +11,13 @@ st.set_page_config(
 st.title("Attendance Abnormal Report")
 st.caption("West Region Attendance Monitoring")
 
-DATA_FILE = Path("data/AMS_Attendance_Data.xlsx")
+BASE_DIR = Path(__file__).resolve().parent
+DATA_FILE = BASE_DIR / "AMS_Attendance_Data.xlsx"
+
+@st.cache_data
+def load_data():
+    df = pd.read_excel(DATA_FILE, engine="openpyxl")
+    return df
 
 # df = pd.read_excel(DATA_FILE)
 
