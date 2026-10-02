@@ -12,7 +12,7 @@ st.title("Attendance Abnormal Report")
 st.caption("West Region Attendance Monitoring")
 
 BASE_DIR = Path(__file__).resolve().parent
-DATA_FILE = BASE_DIR / "AMS_Attendance_Data.xlsx"
+DATA_FILE = BASE_DIR / "data" / "AMS_Attendance_Data.xlsx"
 
 @st.cache_data
 def load_data():
