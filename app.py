@@ -659,6 +659,23 @@ detail_display["status"] = pd.to_numeric(
     errors="coerce"
 ).astype("Int64")
 
+# Sort: Pending first → Warehouse → Date → Abnormal Type
+detail_display = detail_display.sort_values(
+    by=[
+        "status",
+        "WarehouseName",
+        "eday",
+        "AbnormalTypeDisplay"
+    ],
+    ascending=[
+        True,   # status 0 first
+        True,   # Warehouse A-Z
+        False,  # Latest date first
+        True    # Abnormal Type A-Z
+    ],
+    na_position="last"
+)
+
 def highlight_pending(row):
     if row["status"] == 0:
         return [
