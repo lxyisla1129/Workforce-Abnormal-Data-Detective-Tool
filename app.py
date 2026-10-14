@@ -242,18 +242,18 @@ col3.metric(
 )
 
 col4.metric(
+    "Pending Adjustment Employees",
+    f"{pending_employees:,}"
+)
+
+col5.metric(
     "Abnormal Rate",
     f"{abnormal_rate:.2f}%"
 )
 
-col5.metric(
+col6.metric(
     "Abnormal Hour Gap",
     f"{total_abnormal_hours:,.1f} hrs"
-)
-
-col6.metric(
-    "Pending Adjustment Employees",
-    f"{pending_employees:,}"
 )
 
 st.divider()
