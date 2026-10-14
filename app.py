@@ -179,6 +179,21 @@ filtered_df ["isAbnormal"] = (~filtered_df ["abnormalType"].isin(Normal_type))
 
 abnormal_df = filtered_df[filtered_df["isAbnormal"]].copy()
 
+filtered_df["status"] = pd.to_numeric(
+    filtered_df["status"],
+    errors="coerce"
+)
+
+abnormal_df = filtered_df[
+    filtered_df["isAbnormal"]
+].copy()
+
+pending_df = abnormal_df[
+    abnormal_df["status"] == 0
+].copy()
+
+pending_employees = pending_df["userCode"].nunique()
+
 # Dashboard
 
 total_employees = filtered_df["userCode"].nunique()
@@ -209,7 +224,7 @@ total_abnormal_hours = (
     abnormal_df["AbnormalHours"].sum()
 )
 
-col1, col2, col3, col4, col5 = st.columns(5)
+col1, col2, col3, col4, col5, col6 = st.columns(6)
 
 col1.metric(
     "Total Employees",
@@ -234,6 +249,11 @@ col4.metric(
 col5.metric(
     "Abnormal Hour Gap",
     f"{total_abnormal_hours:,.1f} hrs"
+)
+
+col6.metric(
+    "Pending Adjustment Employees",
+    f"{pending_employees:,}"
 )
 
 st.divider()
@@ -621,6 +641,7 @@ display_columns = [
     "GroupNameDisplay",
     "userCode",
     "AbnormalTypeDisplay",
+    "status",
     "scheduledHours",
     "actualHours",
     "hourGap"
@@ -631,8 +652,26 @@ display_columns = [
     if c in detail_df.columns
 ]
 
+detail_display = detail_df[display_columns].copy()
+
+detail_display["status"] = pd.to_numeric(
+    detail_display["status"],
+    errors="coerce"
+).astype("Int64")
+
+def highlight_pending(row):
+    if row["status"] == 0:
+        return [
+            "background-color: #ffcccc; color: #990000"
+        ] * len(row)
+
+    return [""] * len(row)
+
 st.dataframe(
-    detail_df[display_columns],
+    detail_display.style.apply(
+        highlight_pending,
+        axis=1
+    ),
     use_container_width=True,
     hide_index=True
 )
